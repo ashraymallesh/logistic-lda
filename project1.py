@@ -1,12 +1,34 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
-# Import data into pandas dataframe
-#winedf = pd.read_csv("winequality-red.csv") #wine dataframe
+# Import data into a pandas dataframe
+winedf = pd.read_csv("winequality-red.csv", sep=';')
 
-#importing data into a numpy ndarray
+#checking for missing values
+print(winedf.isnull().sum())
+
+wineData = winedf.to_numpy()
+print(wineData.head)
+#import wine data into a numpy ndarray
 wineData = np.genfromtxt("winequality-red.csv", delimiter=";", skip_header=1)
-print(wineData)
+#checking for missing values
+n = np.isnan(wineData).astype(int).sum()
+
+
+#create a quality column with 1/0 labels for wines with a rating of 6 or higher
+quality = (wineData[:,11]>=6).astype(int)
+
+#append the column to the end of data array
+wineData = np.c_[wineData, quality]
+
+#import breast cancer data into a numpy ndarray
+bcData = np.genfromtxt("breast-cancer-wisconsin.data", delimiter=",")
+
+#checking for missing values
+n = np.isnan(bcData).astype(int).sum()
+
+
 
 """
 # Check for null data
