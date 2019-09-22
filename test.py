@@ -27,3 +27,15 @@ print(np.isnan(bcData).astype(int).sum())
 #bcdf.replace('?', np.NaN, inplace=True)
 
 #bcdf.apply(pd.to_numeric, errors='coerce')
+
+"""
+def isnumber(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
+bcdf[bcdf.applymap(isnumber)]
+
+"""
