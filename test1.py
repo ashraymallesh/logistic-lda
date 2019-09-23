@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import numpy as np
 import math
 
@@ -84,4 +85,46 @@ def label_binary_quality(row):
     else:
         return 1
 winedf["binary_quality"] = winedf.apply(lambda row: label_binary_quality(row), axis=1)
+=======
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Import data into a pandas dataframe
+winedf = pd.read_csv("winequality-red.csv", sep=';')
+
+#checking for missing values
+#print(winedf.isnull().sum())
+
+wineData = winedf.to_numpy()
+
+#create a quality column with 1/0 labels for wines with a rating of 6 or higher
+quality = (wineData[:,11]>=6).astype(int)
+
+#append the column to the end of data array
+wineData = np.c_[wineData, quality]
+
+#import breast cancer data into a numpy ndarray
+bcData = np.genfromtxt("breast-cancer-wisconsin.data", delimiter=",")
+
+
+
+bcdf = pd.read_csv("breast-cancer-wisconsin.data", sep=',', header=None)
+#bcData = bcdf.to_numpy()
+print(np.isnan(bcData).astype(int).sum())
+#bcdf.replace('?', np.NaN, inplace=True)
+
+#bcdf.apply(pd.to_numeric, errors='coerce')
+
+"""
+def isnumber(x):
+    try:
+        float(x)
+        return True
+    except:
+        return False
+
+bcdf[bcdf.applymap(isnumber)]
+
+>>>>>>> 354458b51e64e430c96ca6b9ffdc68a31b9443e1
 """
