@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import math
 
 
@@ -26,7 +27,7 @@ class LogisticRegressionModel:
                 total += X[i] * float(Y[i] - logistic(self.weights.T @ X[i]))
             
             # Adjust the weights by the sum multipled by the learning weight
-            self.weights += (learningRate * total).T
+            self.weights = self.weights + (learningRate * total).T
     
     """
     Takes a feature vector "X" and a binary 0/1 classification
@@ -40,6 +41,12 @@ class LogisticRegressionModel:
 
 # Import csv file into 
 wine_data = np.genfromtxt('winequality-red.csv', delimiter=';')
+cancer_data = pd.read_csv("breast-cancer-wisconsin.data", sep=',', header=None)
+cancer_data.columns = ['Sample code', 'Clump Thickness', 'Uniformity of Cell Size', 'Uniformity of Cell Shape',
+                'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin',
+                'Normal Nucleoli', 'Mitoses', 'Class']
+cancer_data.replace('?', np.NaN, inplace=True)
+cancer_data = cancer_data.dropna().to_numpy().astype(float)
 
 # Remove first row from data (row that has column labels)
 wine_data = wine_data[1:, :]
@@ -50,25 +57,32 @@ wine_data = wine_data[1:, :]
 quality_data = np.apply_along_axis(lambda x: x >= 6, 0, wine_data[:,11])
 quality_data = quality_data.astype(int)
 
+# Determine class vector for tumors
+cancer_class_data = np.apply_along_axis(lambda x: x == 4, 0, cancer_data[:,10])
+cancer_class_data = cancer_class_data.astype(int)
+
 # Remove quality column
 wine_data = wine_data[:, :11]
+cancer_data = cancer_data[:, :10]
 
-# Normalize wine_data
-#wine_data = wine_data / wine_data.max(axis=0)
-#print(wine_data)
+# Normalize data
+wine_data = wine_data / wine_data.max(axis=0)
+cancer_data = cancer_data / cancer_data.max(axis=0)
 
 # Add add column of ones to the end as bias term
 bias_column = np.array(np.ones((wine_data.shape[0], 1)))
 wine_data = np.append(wine_data, bias_column, axis=1)
+bias_column = np.array(np.ones((cancer_data.shape[0], 1)))
+cancer_data = np.append(cancer_data, bias_column, axis=1)
 
 # Apply model
-model = LogisticRegressionModel(wine_data.shape[1])
-model.fit(wine_data, quality_data, 0.01, 100)
+model = LogisticRegressionModel(cancer_data.shape[1])
+model.fit(cancer_data, cancer_class_data, 0.0001, 1000)
 errors = 0
-for i in range(wine_data.shape[0]):
-    if (quality_data[i] == 1 and model.predict(wine_data[i]) < 0.5):
+for i in range(cancer_data.shape[0]):
+    if (cancer_class_data[i] == 1 and model.predict(cancer_data[i]) < 0.5):
         errors += 1
-    elif (quality_data[i] == 0 and model.predict(wine_data[i]) > 0.5):
+    elif (cancer_class_data[i] == 0 and model.predict(cancer_data[i]) > 0.5):
         errors += 1
-    print(quality_data[i], "vs", model.predict(wine_data[i]))
-print("%0.2f percent accuracy" % (errors / wine_data.shape[0] * 100))
+    print(cancer_class_data[i], "vs", model.predict(cancer_data[i]))
+print("%0.2f percent accuracy" % ((1 - errors / cancer_data.shape[0]) * 100))
