@@ -34,6 +34,7 @@ bcdf = pd.read_csv("breast-cancer-wisconsin.data", sep=',', header=None)
 bcdf.replace('?', np.NaN, inplace=True)
 bcdf = bcdf.dropna()
 
+
 class LogisticRegression:
     """Implementing Logistic Regression without sklearn"""
 
@@ -43,8 +44,8 @@ class LogisticRegression:
         """ Contstructor to create a new object """
         self.y = y
         
-    def fit(self, X, y):
-        """ Fit training data """
+    def fit(self, X, y, steps):
+        """ Fit training data using gradient descent"""
         return self.X, self.y
 
     def predict(self, X_new):
