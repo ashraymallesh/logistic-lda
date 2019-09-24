@@ -17,22 +17,19 @@ bcdf[bcdf.applymap(isnumber)]
 
 # Import data into a pandas dataframe
 winedf = pd.read_csv("winequality-red.csv", sep=';')
-
-
-
 wineData = winedf.to_numpy()
 
 #create a quality column with 1/0 labels for wines with a rating of 6 or higher
-quality = (wineData[:,11]>=6).astype(int)
+wine_quality = (wineData[:,11]>=6).astype(int)
 
 #append the column to the end of data array
-wineData = np.c_[wineData, quality]
+wineData = np.c_[wineData, wine_quality]
 
 #import breast cancer data into a numpy ndarray
-bcData = np.genfromtxt("breast-cancer-wisconsin.data", delimiter=",")
 bcdf = pd.read_csv("breast-cancer-wisconsin.data", sep=',', header=None)
 bcdf.replace('?', np.NaN, inplace=True)
 bcdf = bcdf.dropna()
+bcData = bcdf.to_numpy().astype(float)
 
 #weights=self.weights, alpha=self.alpha, X=self.X, y=self.y
 
@@ -68,7 +65,10 @@ class LogisticRegression:
         return 1 / (1 + np.exp(-z))
 
     def label(v):
-        """ outputs 1 if v>= 0.5 and 0 if v<0.5 """
+        """ 
+        v is a vector (numpy ndarray)
+        this function updates each row to 1 if >= 0.5 and 0 if <0.5
+        """
         v[v>=0.5] = 1
         v[v<0.5] = 0
         return v
@@ -78,6 +78,7 @@ class LogisticRegression:
     def fit(self, steps):
         """
         Fit training data using gradient descent (GD update perfomed 'steps' number of times)
+        Calculates and updates optimal weights for the model after "training" with data.
         """
 
         for i in range(steps):
@@ -86,23 +87,34 @@ class LogisticRegression:
             # then multiplying by X.T is a nxm @ mx1 produces a nx1 vector
             # this numpy vectorized implementation of the gradient descent update is a lot more efficient than
             # manually updating each weight using a python for-loop to calculate summmations
-        return weights
+        #return self.weights
 
-    def predict(self, X_new):
+    def predict(self, X_test):
         """
-        Given a trained model, predict labels for a new set of data,
+        Given a trained model, predict labels for new data X_test (which is a mxn matrix),
         mxn @ nx1 gives a mx1 vector of predicted 0/1 labels. Sigmoid function calculates
         a vector of probabilities where each row is the probablity of being classified positive (1)
 
         This vector is passed into a "label" function which outputs 1 if probability>=0.5
         and 0 if probability<0.5
+
+        predict returns a m-dimensional vector of 0/1 predicted labels
+        """
+        predicted_labels = label(sigmoid(X_test @ self.weights))
+        return predicted_labels
+
+    def evaluate_acc(self, y_predicted, y_test):
+        """
+        Check the accuracy of the predictions calculated by the predict method of the model
+        Returns a percentage accuracy (float)
         """
 
-        return label(sigmoid(X_new @ self.weights))
+        if y_predicted.shape != y_test: return None # shapes aren't equal
 
-    def evaluate_acc(self, y, y_new):
-        """ Check the accuracy of the predictions calculated by the predict method of the model """
-        return self.y - self.y_new
+        test_set_size = y_predicted.shape[0]
+        numErrors = np.sum(np.abs(y_predicted - y_test), dtype=float) #output float to force float division
+        accuracy = 100 - (numErrors/test_set_size)
+        return accuracy
 
     
 
