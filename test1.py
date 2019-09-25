@@ -63,7 +63,7 @@ cancer_class_data = cancer_class_data.astype(int)
 
 # Remove quality column
 wine_data = wine_data[:, :11]
-cancer_data = cancer_data[:, :10]
+cancer_data = cancer_data[:, 1:10]
 
 # Normalize data
 wine_data = wine_data / wine_data.max(axis=0)
