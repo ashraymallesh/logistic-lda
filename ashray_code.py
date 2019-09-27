@@ -27,11 +27,6 @@ def classifyLDA(v):
     v[v<=0] = 0
     return v
 
-
-    
-def normalize(dataset):
-    return dataset / dataset.max(axis=0)
-
 #Data Cleaning
 winedf = pd.read_csv("winequality-red.csv", sep=';')
 wineData = winedf.to_numpy()
@@ -47,6 +42,8 @@ bcdf.drop(['Sample Code Number'], axis=1, inplace=True)
 bcData = bcdf.to_numpy().astype(float)
 bcData[:,-1] = (bcData[:,-1]>3).astype(int) #change 2/4 last column to 0/1 labels
 bcData = bcData/bcData.max(axis=0) #normalize data
+
+
 def train_test_split(dataset, ratio=0.2):
     """
     split dataset into training and test subsets
