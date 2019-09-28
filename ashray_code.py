@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import expit
-import math
+from math import floor
 
 # Some helper functions:
 def sigmoid(z):
@@ -26,6 +26,19 @@ def classifyLDA(v):
     v[v>0] = 1
     v[v<=0] = 0
     return v
+
+def evaluate_acc(y_predict, y_test):
+        """
+        y_predict and y_test are vectors
+        Check the accuracy of y_predict by comparing it to y_test
+        Returns a percentage accuracy (float)
+        """
+
+        test_set_size = y_test.shape[0]
+        numErrors = np.sum( np.abs(y_predict - y_test) )
+        errorPercentage = (numErrors/test_set_size) * 100
+        accuracy = 100 - errorPercentage
+        return accuracy
 
 #Data Cleaning
 winedf = pd.read_csv("winequality-red.csv", sep=';')
@@ -51,7 +64,7 @@ def train_test_split(dataset, ratio=0.2):
     returns data_train, data_test
     """
     dataset_size = dataset.shape[0]
-    test_set_size = math.floor(ratio * dataset_size)
+    test_set_size = floor(ratio * dataset_size)
     training_set_size = dataset_size - test_set_size
     data_train = dataset[0:training_set_size, :]
     data_test = dataset[test_set_size:, :]
@@ -69,7 +82,7 @@ def k_fold_split(dataset, num_folds=5):
     dataset_size = dataset.shape[0]
 
     # Determine the number of examples in a single fold
-    fold_size = math.floor(1 / num_folds * dataset_size)
+    fold_size = floor(1 / num_folds * dataset_size)
 
     # Break the examples up into "folds" number of folds
     folds = []
@@ -112,7 +125,7 @@ class LogisticRegression:
         """
         self.data = data
         self.X = data[:,:-1]
-        self.y = self.data[:,-1][:, np.newaxis]
+        self.y = self.data[:,-1][:, np.newaxis] #np.newaxis to turn this into an (n,1)-shaped array
         self.m = self.X.shape[0]
         X = np.c_[np.ones(shape=(self.m,1)), self.X] #add bias column of ones to feature matrix
         self.n = self.X.shape[1]
@@ -148,18 +161,6 @@ class LogisticRegression:
         predicted_labels = classifyLogistic(sigmoid(X_test @ self.weights))
         return predicted_labels
 
-    def evaluate_acc(self, y_predict, y_test):
-        """
-        Check the accuracy of the predictions calculated by the predict method of the model
-        Returns a percentage accuracy (float)
-        """
-
-        test_set_size = y_test.shape[0]
-        numErrors = np.sum( np.abs(y_predict - y_test) )
-        errorPercentage = (numErrors/test_set_size) * 100
-        accuracy = 100 - errorPercentage
-        return accuracy
-
 class LDA:
     """Implementing an LDA (Linear Discriminant Analysis) model from scratch"""
 
@@ -169,49 +170,66 @@ class LDA:
 
         data        = matrix (numpy ndarray) of dataset with labels as the last column
         X           = matrix (numpy ndarray) of dataset with labels (last column) removed
-        y           = vector (numpy ndarray) of labels (last column of data)
-        m           = total number of training examples (= number of rows of X or y)
-        num0        = number of training examples in class 0
-        num1        = number of training examples in class 1
+        X1          = (numpy ndarray) rows of X that belong to class 1
+        X0          = (numpy ndarray) rows of X that belong to class 0
 
         """
         self.data = data
         self.X = data[:,:-1]
-        self.y = data[:,-1][:, np.newaxis]
-        self.m = X.shape[0]
-        self.num1 = np.sum(y) #y is a column of binary values, summing it should give us the number of 1s
-        self.num0 = m - num1 #number of 0s = total - number of 1s
-
-
-        
+        self.X1 = self.X[data[:,-1]==1]
+        self.X0 = self.X[data[:,-1]==0]
 
     # Model implementation begins below:     
     def fit(self):
         """
         Fit training data
-        Calculates log odds ratio after "training" with data.
+        Calculates mu1 and mu0 (mean vectors) and sigma (shared covariance matrix) using training data.
+
+        num0        = number of training examples in class 0 (number of rows of X0)
+        num1        = number of training examples in class 1 (number of rows of X1)
+        mu1         = array of mean of columns in X1
+        mu0         = array of mean of columns in X0
+        m           = total number of training examples (= number of rows of X)
+        sigma       = shared covariance matrix for the dataset
+
         """
+
+        self.num1 = self.X1.shape[0] 
+        self.num0 = self.X0.shape[0]
+        self.mu1 = np.mean(self.X1, axis=0)[:,np.newaxis]
+        self.mu0 = np.mean(self.X0, axis=0)[:,np.newaxis]
+        m = self.X.shape[0]
+        self.sigma = (np.cov(self.X1.T) + np.cov(self.X0.T)) / (m - 2)
+
 
     def predict(self, X_test):
         """
         Given a trained model, predict labels for new data X_test (which is a mxn matrix),
         predict returns a m-dimensional vector of 0/1 predicted labels
+
+        calculated using the formula on lecture 5, slide 26, comp 551 fall 2019
+        from https://cs.mcgill.ca/~wlh/comp551/slides/05-linear_classification_cont.pdf
+
+
+        logodds_vector = vector of predicted log odds for every row in X_test
         """
-        predicted_labels = classifyLDA(np.zeros((n,1)))
+        sigma_inv = np.linalg.inv(self.sigma)
+        term1 = np.log(self.num1/self.num0) #no need to include the denominators as they cancel out
+        term2 = 0.5*(self.mu1.T @ sigma_inv @ self.mu1)
+        term3 = 0.5*(self.mu0.T @ sigma_inv @ self.mu0)
+        term4 = X_test @ sigma_inv @ (self.mu1-self.mu0)
+
+        logodds_vector = term1 - term2 + term3 + term4
+        predicted_labels = classifyLDA(logodds_vector)
         return predicted_labels
 
-    def evaluate_acc(self, y_predict, y_test):
-        """
-        Check the accuracy of the predictions calculated by the predict method of the model
-        Returns a percentage accuracy (float)
-        """
 
-        test_set_size = y_test.shape[0]
-        numErrors = np.sum( np.abs(y_predict - y_test) )
-        errorPercentage = (numErrors/test_set_size) * 100
-        accuracy = 100 - errorPercentage
-        return accuracy
-
+model = LDA(bcData)
+model.fit()
+X_test = bcData[:,:-1]
+y_predict = model.predict(X_test)
+acc = evaluate_acc(y_predict, bcData[:,-1][:,np.newaxis])
+print(acc)
 
 """
 #testing on the whole dataset
@@ -309,7 +327,7 @@ plt.show()
 
 
 
-
+"""
 #Training on entire BC data
 model = LogisticRegression(data=bcData)
 model.fit(steps=10000)
@@ -320,3 +338,5 @@ bcAccuracy = model.evaluate_acc(y_predict=y_predicted, y_test=y_test)
 
 print("breast cancer model accuracy is")
 print(bcAccuracy)
+
+"""
