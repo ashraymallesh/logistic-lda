@@ -22,6 +22,10 @@ bcData = bcdf.to_numpy().astype(float)
 bcData[:,-1] = (bcData[:,-1]>3).astype(int) #change 2/4 last column to 0/1 labels
 bcData = bcData/bcData.max(axis=0) #normalize data
 
+acc = kfold.kFoldCrossValidation(bcData, model="LR")
+print(acc)
+
+"""
 model = LDA(bcData)
 model.fit()
 X_test = bcData[:,:-1]
@@ -29,6 +33,9 @@ y_predict = model.predict(X_test)
 y_test = bcData[:,-1][:,np.newaxis]
 acc = utils.evaluate_acc(y_predict, y_test)
 print(acc)
+
+"""
+
 
 """
 #testing on the whole dataset
