@@ -4,7 +4,7 @@ from LogisticRegression import LogisticRegression
 from LDA import LDA
 import utils
 
-def kFoldCrossValidate(dataset, classificationModel, numFolds=5, shuffle='off', alpha=0.0002):
+def kFoldCrossValidate(dataset, classificationModel, numFolds=5, shuffle='off', alpha=0.0002, steps=10000):
     """
     numFolder               = number of folds (default: 5)
     dataset                 = numpy array of preprocessed dataset with last column = labels
@@ -38,7 +38,7 @@ def kFoldCrossValidate(dataset, classificationModel, numFolds=5, shuffle='off', 
             model.fit()
         elif classificationModel=='LR':
             model = LogisticRegression(data=trainingData)
-            model.fit(alpha=alpha)
+            model.fit(steps=steps, alpha=alpha)
         X_test = validationData[:,:-1] #remove last col of validationData
         y_predict = model.predict(X_test=X_test)
         y_test = validationData[:,-1][:,np.newaxis] #last col of validationData
