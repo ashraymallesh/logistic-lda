@@ -26,12 +26,15 @@ bcData = bcdf.to_numpy().astype(float)
 bcData[:,-1] = (bcData[:,-1]>3).astype(int) #change 2/4 last column to 0/1 labels
 bcData = bcData/bcData.max(axis=0) #normalize data
 
-learning_rates = [0.000001, 0.00001, 0.0001, 0.001, 0.1, 1]
-learning_rates2 = np.arange(start=0.0001,stop= 0.001, step=0.0001)
-accuracies = []
-for alpha in learning_rates2:
-    acc = kfold.kFoldCrossValidate(dataset=wineData, classificationModel='LR', alpha=alpha)
-    accuracies.append(acc)
-print(accuracies)
+def test_learning_rates():
+    learning_rates = [0.000001, 0.00001, 0.0001, 0.001, 0.1, 1]
+    learning_rates2 = np.arange(start=0.0001,stop= 0.001, step=0.0001)
+    accuracies = []; accuracies2 = []
+    for alpha in learning_rates:
+        acc = kfold.kFoldCrossValidate(dataset=wineData, classificationModel='LR', alpha=alpha)
+        accuracies.append(acc)
+    for alpha in learning_rates:
+        acc = kfold.kFoldCrossValidate(dataset=wineData, classificationModel='LR', alpha=alpha)
+        accuracies2.append(acc)
+    print(accuracies)
 
-print(learning_rates2[1])

@@ -57,5 +57,6 @@ def train_test_split(dataset, ratio=0.2):
 def removeOutliers(df):
     """
     returns df with outliers removed (outside of IQR)
+    adapted from https://stackoverflow.com/questions/23199796/detect-and-exclude-outliers-in-pandas-data-frame
     """
     return df[(np.abs(zscore(df)) < 3).all(axis=1)]
