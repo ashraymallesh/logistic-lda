@@ -3,7 +3,7 @@ from utils import sigmoid, classifyLogistic
 
 class LogisticRegression:
     """Implementing a Logistic Regression model without sklearn"""
-
+  
     def __init__(self, data):
         """
 
@@ -28,7 +28,7 @@ class LogisticRegression:
         
 
     # Model implementation begins below:     
-    def fit(self, steps=30000, alpha=0.0001):
+    def fit(self, steps=10000, alpha=0.0002):
         """
         Fit training data using gradient descent (GD update perfomed 'steps' number of times)
         Calculates and updates optimal weights for the model after "training" with data.

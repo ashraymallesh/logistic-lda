@@ -1,6 +1,7 @@
 from scipy.special import expit
 import numpy as np
 from math import floor
+from scipy.stats import zscore #for outlier removal
 
 #Function for Task 2
 def evaluate_acc(y_predict, y_test):
@@ -51,3 +52,10 @@ def train_test_split(dataset, ratio=0.2):
     data_train = dataset[0:training_set_size, :]
     data_test = dataset[test_set_size:, :]
     return data_train, data_test
+
+
+def removeOutliers(df):
+    """
+    returns df with outliers removed (outside of IQR)
+    """
+    return df[(np.abs(zscore(df)) < 3).all(axis=1)]

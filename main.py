@@ -8,6 +8,9 @@ import utils, kfold
 
 #Data cleaning and preprocessing
 winedf = pd.read_csv("datasets/winequality-red.csv", sep=';')
+del winedf['citric acid']
+del winedf['fixed acidity']
+del winedf['free sulfur dioxide']
 wineData = winedf.to_numpy()
 wineData[:,-1] = (wineData[:,-1]>=6).astype(int) #convert 6+ to 1 and <5 to 0
 wineData = wineData/wineData.max(axis=0) #normalize data
@@ -23,6 +26,12 @@ bcData = bcdf.to_numpy().astype(float)
 bcData[:,-1] = (bcData[:,-1]>3).astype(int) #change 2/4 last column to 0/1 labels
 bcData = bcData/bcData.max(axis=0) #normalize data
 
-#test
-acc = kfold.kFoldCrossValidation(dataset=bcData, classificationModel='LDA')
-print(acc)
+learning_rates = [0.000001, 0.00001, 0.0001, 0.001, 0.1, 1]
+learning_rates2 = np.arange(start=0.0001,stop= 0.001, step=0.0001)
+accuracies = []
+for alpha in learning_rates2:
+    acc = kfold.kFoldCrossValidate(dataset=wineData, classificationModel='LR', alpha=alpha)
+    accuracies.append(acc)
+print(accuracies)
+
+print(learning_rates2[1])
