@@ -11,7 +11,7 @@ winedf = pd.read_csv("datasets/winequality-red.csv", sep=';')
 del winedf['citric acid']
 del winedf['fixed acidity']
 del winedf['free sulfur dioxide']
-wineData = winedf.to_numpy()
+wineData = winedf.to_numpy() #create numpy array
 wineData[:,-1] = (wineData[:,-1]>=6).astype(int) #convert 6+ to 1 and <5 to 0
 wineData = wineData/wineData.max(axis=0) #normalize data
 
@@ -20,7 +20,7 @@ bcdf.columns = ['Sample Code Number', 'Clump Thickness', 'Uniformity of Cell Siz
                 'Marginal Adhesion', 'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin',
                 'Normal Nucleoli', 'Mitoses', 'Class']
 bcdf.replace('?', np.NaN, inplace=True)
-bcdf.dropna(inplace=True)
+bcdf.dropna(inplace=True) #drop columns with NaN values
 bcdf.drop(['Sample Code Number'], axis=1, inplace=True)
 bcData = bcdf.to_numpy().astype(float)
 bcData[:,-1] = (bcData[:,-1]>3).astype(int) #change 2/4 last column to 0/1 labels
