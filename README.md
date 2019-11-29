@@ -1,6 +1,6 @@
-# COMP-551-Project-1
+# COMP 551 MiniProject 1
 
-Authors:
-Ashray Malleshachari, Logan Ralston, Hamza Rizwan
-
-McGill University
+## Goals
+- Implementing Logistic Regression from scratch
+- Implementing Linear Discriminant Analysis from scratch
+- Testing performance on 2 datasets: Wine and Breast Cancer
