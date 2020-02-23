@@ -1,5 +1,7 @@
 # COMP 551 MiniProject 1
 
+[Project Spec](miniproject1_spec.pdf)
+
 ## Goals
 - Implementing Logistic Regression from scratch
 - Implementing Linear Discriminant Analysis from scratch
