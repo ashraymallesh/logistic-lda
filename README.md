@@ -1,8 +1,6 @@
-# COMP 551 MiniProject 1
+# Exploring Logistic Regression and LDA Performance on Wine and Breast Cancer Datasets
 
-[Project Spec](miniproject1_spec.pdf)
+### [Project Spec](miniproject1_spec.pdf)
 
-## Goals
-- Implementing Logistic Regression from scratch
-- Implementing Linear Discriminant Analysis from scratch
-- Testing performance on 2 datasets: Wine and Breast Cancer
+### [Final Report](mp1.pdf)
+
